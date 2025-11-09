@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrubText</title>
+  <style>
+    :root {
+      --dark-green: #0B3D2E;
+      --mid-green: #397D54;
+      --light-green: #D8EAD3;
+    }
+
+    body {
+      background-color: var(--dark-green);
+      color: var(--light-green);
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 25px;
+      line-height: 1.6;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 14px;
+      margin-bottom: 25px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    textarea {
+      width: 90%;
+      height: 130px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      background-color: var(--light-green);
+      color: #000;
+      outline: none;
+      resize: none;
+    }
+
+    button {
+      background-color: var(--mid-green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      margin: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    #output {
+      width: 90%;
+      min-height: 100px;
+      margin-top: 15px;
+      background-color: var(--light-green);
+      color: #000;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: left;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-y: auto;
+    }
+
+    .stats {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #CDE3D1;
+    }
+
+    .tip {
+      font-size: 13px;
+      color: #A8C4AF;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>ScrubText</h2>
+  <p>Paste your text below to detect invisible watermarks, zero-width spaces, and random spacing.  
+     Everything happens locally — nothing is uploaded.</p>
+
+  <textarea id="input" placeholder="Paste text here..."></textarea><br>
+
+  <button onclick="detect()">Detect Watermarks</button>
+  <button onclick="clean()">Clean Text</button>
+  <button onclick="copyOutput()">Copy Output</button>
+
+  <div id="output"></div>
+  <div class="stats" id="stats"></div>
+  <div class="tip">Tip: Tap <b>Detect</b> to visualize invisible marks as ⬛, then <b>Clean</b> to remove them.</div>
+
+  <script>
+    function detect() {
+      const text = document.getElementById('input').value;
+      const zeroWidth = /[\u200B-\u200F\uFEFF\u202A-\u202E]/g;
+      const matches = text.match(zeroWidth) || [];
+      const marked = text.replace(zeroWidth, '⬛');
+      document.getElementById('output').innerText = marked;
+      document.getElementById('stats').innerText =
+        `Detected: ${matches.length} invisible mark${matches.length !== 1 ? 's' : ''}`;
+    }
+
+    function clean() {
+      let text = document.getElementById('input').value;
+      text = text.replace(/[\u200B-\u200F\uFEFF\u202A-\u202E]/g, '');
+      text = text.replace(/\s{2,}/g, ' ');
+      document.getElementById('output').innerText = text.trim();
+      document.getElementById('stats').innerText = 'Cleaned successfully.';
+    }
+
+    function copyOutput() {
+      const output = document.getElementById('output').innerText;
+      if (!output) {
+        document.getElementById('stats').innerText = 'Nothing to copy.';
+        return;
+      }
+      navigator.clipboard.writeText(output).then(() => {
+        document.getElementById('stats').innerText = 'Copied to clipboard!';
+      });
+    }
+  </script>
+</body>
+</html>
